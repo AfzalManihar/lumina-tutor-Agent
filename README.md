@@ -232,8 +232,9 @@ The project brings together instructional design, structured AI workflows, learn
 
 Interested in Agentic AI, Generative AI, and building practical AI applications.
 
-- GitHub: [@AfzalManihar](https://github.com/AfzalManihar)
-- Project repository: [lumina-tutor-Agent](https://github.com/AfzalManihar/lumina-tutor-Agent)
+- 🌐 **Portfolio:** [afzalmanihar.github.io](https://afzalmanihar.github.io)
+- 💻 **GitHub:** [@AfzalManihar](https://github.com/AfzalManihar)
+- 🔗 **LinkedIn:** [Connect with me](https://www.linkedin.com/in/afzal-manihar-bb0183308/)
 - Live application: [Lumina Tutor](https://lumina-tutor-agent.streamlit.app/)
 
 ## 📄 License
