@@ -47,7 +47,10 @@ html,body,.stApp{background:var(--bg)!important;color:var(--txt);font-family:'In
 .stApp:before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(60vw 45vh at 12% 8%,rgba(124,131,255,.22),transparent 60%),radial-gradient(50vw 40vh at 92% 12%,rgba(34,211,238,.14),transparent 60%),radial-gradient(55vw 50vh at 60% 100%,rgba(168,85,247,.14),transparent 60%);animation:drift 18s ease-in-out infinite alternate;}
 @keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-2%,2%,0) scale(1.06)}}
 header[data-testid="stHeader"]{background:transparent!important;}
-#MainMenu,footer,[data-testid="stToolbar"],[data-testid="stDecoration"]{display:none!important;}
+#MainMenu,footer,[data-testid="stDecoration"],[data-testid="stToolbarActions"],[data-testid="stAppDeployButton"],[data-testid="stMainMenu"]{display:none!important;}
+[data-testid="stExpandSidebarButton"],[data-testid="stSidebarCollapsedControl"],[data-testid="stSidebarCollapseButton"]{display:flex!important;visibility:visible!important;opacity:1!important;z-index:999999!important;}
+[data-testid="stExpandSidebarButton"] button,[data-testid="stSidebarCollapsedControl"] button,[data-testid="stExpandSidebarButton"],[data-testid="stSidebarCollapsedControl"]{background:rgba(124,140,255,.25)!important;border-radius:10px!important;color:#fff!important;}
+[data-testid="stExpandSidebarButton"] *,[data-testid="stSidebarCollapsedControl"] *{color:#fff!important;fill:#fff!important;}
 .block-container{padding:1.1rem 2rem 2rem 2rem!important;max-width:1500px!important;position:relative;z-index:1;}
 h1,h2,h3,h4{font-family:'Space Grotesk','Inter',system-ui,sans-serif!important;letter-spacing:-.01em;color:var(--txt)!important;}
 ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px}
