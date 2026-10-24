@@ -466,7 +466,9 @@ def say(text: str, *extra):
 
 
 def parse_options(prompt: str):
-    opts = {m.group(1): m.group(2) for m in re.finditer(r"^\s*([A-D])\)\s*(.+)$", prompt, re.M)}
+    # The live lesson text can contain a literal backslash-n instead of a real newline.
+    prompt = str(prompt).replace("\\r\\n", "\n").replace("\\n", "\n").replace("\r\n", "\n")
+    opts ={m.group(1): m.group(2) for m in re.finditer(r"^\s*([A-D])\)\s*(.+)$", prompt, re.M)}
     stem = re.sub(r"^\s*[A-D]\)\s*.+$", "", prompt, flags=re.M).strip()
     return stem, opts
 
