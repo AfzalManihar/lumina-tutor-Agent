@@ -735,7 +735,7 @@ with st.sidebar:
         ss.demo_engine = None; ss.metrics = None
         start_session(); st.rerun()
     demo_controls = st.toggle("Presenter controls", value=True, help="One-click correct/wrong answers so you can show the whole fail ladder in a minute.")
-    st.caption(f"Bridge URL: {BACKEND_URL}")
+    
     st.caption("Press Ctrl + B to hide / show this panel.")
 
 if ss.view is None and ss.error is None:
