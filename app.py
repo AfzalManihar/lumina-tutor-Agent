@@ -49,11 +49,11 @@ html,body,.stApp{background:var(--bg)!important;color:var(--txt);font-family:'In
 header[data-testid="stHeader"]{background:transparent!important;}
 #MainMenu,footer,[data-testid="stToolbar"],[data-testid="stDecoration"]{display:none!important;}
 .block-container{padding:1.1rem 2rem 2rem 2rem!important;max-width:1500px!important;position:relative;z-index:1;}
-h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif!important;letter-spacing:-.01em;color:var(--txt)!important;}
+h1,h2,h3,h4{font-family:'Space Grotesk','Inter',system-ui,sans-serif!important;letter-spacing:-.01em;color:var(--txt)!important;}
 ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px}
 /* top bar */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;margin-bottom:16px;border:1px solid var(--line);border-radius:16px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
-.brand{display:flex;align-items:center;gap:12px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Space Grotesk','Inter',system-ui,sans-serif;font-weight:700;font-size:1.15rem;}
 .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--ac1),var(--ac2));display:grid;place-items:center;box-shadow:0 6px 24px rgba(124,131,255,.45);font-size:18px;}
 .brand small{display:block;font-family:'Inter';font-weight:500;color:var(--mut);font-size:.72rem;letter-spacing:.02em;margin-top:1px;}
 .pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-size:.74rem;color:var(--mut);margin-left:8px;}
@@ -72,7 +72,7 @@ h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif!important;letter-spacing:-.01
 /* chat */
 .chat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .chat-head .t{font-family:'Space Grotesk','Inter',system-ui,sans-serif;font-weight:600;font-size:1.05rem}.chat-head .s{color:var(--mut);font-size:.78rem;margin-top:2px}
-.chat-scroll{height:min(52vh,560px);overflow-y:auto;padding:10px 12px;border:1px solid var(--line);border-radius:var(--rad);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));margin-bottom:12px;scroll-behavior:smooth;}
+.chat-scroll{height:min(52vh,560px);overflow-y:auto;padding:10px 12px;border:1px solid var(--line);border-radius:var(--rad);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));backdrop-filter:blur(18px);margin-bottom:12px;scroll-behavior:smooth;}
 .msg{display:flex;gap:10px;margin:12px 0;animation:rise .35s ease both;}
 .msg.student{flex-direction:row-reverse}
 .av{flex:0 0 34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:16px;border:1px solid var(--line);}
@@ -137,8 +137,6 @@ div[data-testid="stForm"]{border:1px solid var(--line)!important;border-radius:1
 .stTabs [aria-selected="true"]{color:#fff!important;background:var(--glass)!important}
 .stTabs [data-baseweb="tab-highlight"]{background:linear-gradient(90deg,var(--ac1),var(--ac2))!important}
 [data-testid="stSidebar"]{background:#0a0d15!important;border-right:1px solid var(--line)}
-#sb-toggle{position:fixed;top:40px;left:4px;width:28px;height:28px;padding:0;border-radius:9px;border:1px solid var(--line);background:var(--glass2);color:var(--txt);font:700 .7rem 'JetBrains Mono',monospace;cursor:pointer;z-index:10000;display:grid;place-items:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:left .25s,box-shadow .2s,border-color .2s;}
-#sb-toggle:hover{border-color:rgba(124,131,255,.6);box-shadow:0 6px 18px rgba(124,131,255,.3);}
 .stAlert{border-radius:14px!important}
 @media (max-width:900px){.block-container{padding:.8rem!important}.g3{grid-template-columns:1fr 1fr}.bub{max-width:92%}}
 </style>
@@ -181,7 +179,11 @@ class LiveBackend:
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.loads(r.read())
         except urllib.error.HTTPError as e:
-            raise BackendError(json.loads(e.read() or b"{}").get("error", str(e)))
+            try:
+                msg = json.loads(e.read() or b"{}").get("error", str(e))
+            except Exception:          # non-JSON body, e.g. a tunnel's "endpoint offline" HTML page
+                msg = f"HTTP {e.code}"
+            raise BackendError(msg)
         except Exception as e:
             raise BackendError(str(e))
 
@@ -735,8 +737,6 @@ with st.sidebar:
         ss.demo_engine = None; ss.metrics = None
         start_session(); st.rerun()
     demo_controls = st.toggle("Presenter controls", value=True, help="One-click correct/wrong answers so you can show the whole fail ladder in a minute.")
-    
-    st.caption("Press Ctrl + B to hide / show this panel.")
 
 if ss.view is None and ss.error is None:
     if ss.mode == "Demo":
@@ -817,10 +817,7 @@ with left:
             if c2.button("🎬 Presenter: wrong answer", use_container_width=True, key=f"ow_{len(ss.messages)}"):
                 answer_exercise(oracle["wrong"]); st.rerun()
     else:
-        H("<div class='card'><h4>🏁 Session finished</h4><div class='mut' style='font-size:.86rem'>Start a new session to show another learner path.</div></div>")
-        if st.button("🔄 Start new session", use_container_width=True, key="new_session_main"):
-            ss.demo_engine = None; ss.metrics = None
-            start_session(); st.rerun()
+        H("<div class='card'><h4>🏁 Session finished</h4><div class='mut' style='font-size:.86rem'>Start a new session from the sidebar to show another learner path.</div></div>")
 
 with right:
     t1, t2, t3 = st.tabs(["Live session", "System metrics", "Engine trace"])
@@ -866,62 +863,3 @@ try:
     st.iframe(JS, height=1)          # newer Streamlit
 except (AttributeError, TypeError):
     components.html(JS, height=0)    # older Streamlit
-
-# =====================================================================================================================
-# 7. SIDEBAR TOGGLE (<< / >> button and Ctrl + B)
-# =====================================================================================================================
-SB_JS = """
-<script>
-(function(){
-  const win = window.parent, doc = win.document;
-  const S = win.__sbToggle = win.__sbToggle || {};
-  // remove whatever an earlier run of this script installed (reruns must not stack listeners)
-  if (S.timer) win.clearInterval(S.timer);
-  if (S.onKey) doc.removeEventListener('keydown', S.onKey, true);
-  if (S.onResize) win.removeEventListener('resize', S.onResize);
-  const old = doc.getElementById('sb-toggle'); if (old) old.remove();
-
-  const sidebar = () => doc.querySelector('section[data-testid="stSidebar"]');
-  const isOpen = () => {
-    const sb = sidebar(); if (!sb) return false;
-    if (sb.getAttribute('aria-expanded') === 'false') return false;
-    return sb.getBoundingClientRect().right > 40;
-  };
-  // Streamlit's own collapse / expand controls (names differ a little between versions)
-  const CLOSE = ['[data-testid="stSidebarCollapseButton"]', '[data-testid="stSidebar"] button[kind="header"]', '[data-testid="baseButton-header"]'];
-  const OPEN  = ['[data-testid="stExpandSidebarButton"]', '[data-testid="stSidebarCollapsedControl"]', '[data-testid="collapsedControl"]'];
-  const click = sels => {
-    for (const s of sels) {
-      const el = doc.querySelector(s);
-      if (el) { (el.tagName === 'BUTTON' ? el : (el.querySelector('button') || el)).click(); return true; }
-    }
-    return false;
-  };
-  const toggle = () => { if (isOpen()) click(CLOSE); else click(OPEN); win.setTimeout(place, 350); };
-
-  const btn = doc.createElement('button');
-  btn.id = 'sb-toggle'; btn.type = 'button';
-  btn.addEventListener('click', toggle);
-  doc.body.appendChild(btn);
-
-  function place() {
-    const open = isOpen(), sb = sidebar();
-    btn.textContent = open ? '<<' : '>>';
-    btn.title = (open ? 'Hide' : 'Show') + ' sidebar (Ctrl + B)';
-    btn.style.left = (open && sb ? Math.round(sb.getBoundingClientRect().right + 4) : 4) + 'px';
-  }
-  S.onKey = e => {
-    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && String(e.key).toLowerCase() === 'b') { e.preventDefault(); toggle(); }
-  };
-  S.onResize = place;
-  doc.addEventListener('keydown', S.onKey, true);
-  win.addEventListener('resize', S.onResize);
-  S.timer = win.setInterval(place, 300);
-  place();
-})();
-</script>
-"""
-try:
-    st.iframe(SB_JS, height=1)          # newer Streamlit
-except (AttributeError, TypeError):
-    components.html(SB_JS, height=0)    # older Streamlit
